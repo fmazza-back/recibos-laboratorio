@@ -1,6 +1,6 @@
 package com.mobydigital.recibo.service;
 
-import com.mobydigital.recibo.dto.FirebaseFirmaResponse;
+import com.mobydigital.recibo.controller.dto.FirebaseFirmaResponse;
 import com.mobydigital.recibo.exception.FirmaException;
 import lombok.RequiredArgsConstructor;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -45,7 +45,7 @@ public class FirmaService {
         }
 
         // 3. Descargar la imagen  desde la URL proporcionada
-        byte[] imagenFirma = descargarUrl(response.getUrl_firma());
+        byte[] imagenFirma = descargarUrl(response.getUrlFirma());
 
         // 4. Firmar
         return aplicarFirma(pdfBytes, imagenFirma, usuarioId);
