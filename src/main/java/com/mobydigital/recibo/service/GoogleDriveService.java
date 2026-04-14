@@ -13,6 +13,7 @@ import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 import com.mobydigital.recibo.config.GoogleDriveConfig;
+import com.mobydigital.recibo.controller.dto.ReciboDTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,9 +27,9 @@ public class GoogleDriveService {
     private String folderId;
 
     /**
-     * Lista todos los PDFs de la carpeta de recibos.
+     * Lista los ultimos 4 PDFs subidos a la carpeta de recibos.
      */
-    public List<File> listarRecibos(String accessToken) throws GeneralSecurityException, IOException {
+    public List<ReciboDTO> listarRecibos(String accessToken) throws GeneralSecurityException, IOException {
         Drive drive = driveConfig.buildClient(accessToken);
 
         String query = String.format(
@@ -39,21 +40,34 @@ public class GoogleDriveService {
         FileList result = drive.files().list()
                 .setQ(query)
                 .setFields("files(id, name, createdTime, webViewLink)")
-                .setOrderBy("name")
+                .setOrderBy("createdTime desc")
+                .setPageSize(4)
                 .execute();
 
         List<File> files = result.getFiles();
-        return files != null ? files : List.of();
+        if (files == null) return List.of();
+
+        return files.stream()
+                .map(f -> new ReciboDTO(
+                        f.getId(),
+                        f.getName(),
+                        f.getCreatedTime() != null ? f.getCreatedTime().toStringRfc3339() : null,
+                        f.getWebViewLink()
+                ))
+                .toList();
     }
 
     /**
      * Busca un recibo especifico por su ID de Drive.
      */
-    public File buscarPorId(String accessToken, String fileId) throws GeneralSecurityException, IOException {
+    public ReciboDTO buscarPorId(String accessToken, String fileId) throws GeneralSecurityException, IOException {
         Drive drive = driveConfig.buildClient(accessToken);
-        return drive.files().get(fileId)
-                .setFields("id, name, webViewLink")
+        File file = drive.files().get(fileId)
+                .setFields("id, name, createdTime, webViewLink")
                 .execute();
+        return new ReciboDTO(file.getId(), file.getName(),
+                file.getCreatedTime() != null ? file.getCreatedTime().toStringRfc3339() : null,
+                file.getWebViewLink());
     }
 
     /**

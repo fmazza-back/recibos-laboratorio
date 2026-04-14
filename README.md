@@ -67,7 +67,8 @@ y lo usa directamente para operar con Drive.
 | Tecnologia | Version | Para que se usa |
 |---|---|---|
 | Java | 17 | Lenguaje base |
-| Spring Boot | 4.0.5 | Framework web y configuracion |
+| Spring Boot | 3.4.4 | Framework web y configuracion |
+| Spring Cloud | 2024.0.1 | Registro en Eureka (service discovery) |
 | H2 | runtime | Base de datos en memoria para desarrollo |
 | Google Drive API v3 | rev20240521 | Listar, descargar y subir PDFs |
 | Google Auth Library | 1.23.0 | Construir el cliente Drive desde el access token |
@@ -280,21 +281,29 @@ Authorization: Bearer {access_token_de_google}
 
 **Response:**
 ```json
-[
-  {
-    "id": "1aBcDeFgHiJkLmNo",
-    "name": "marzo-2026-12345",
-    "createdTime": "2026-03-01T10:00:00.000Z",
-    "webViewLink": "https://drive.google.com/file/d/1aBcDeFgHiJkLmNo/view"
-  },
-  {
-    "id": "2xYzAbCdEfGhIjKl",
-    "name": "marzo-2026-67890",
-    "createdTime": "2026-03-01T10:01:00.000Z",
-    "webViewLink": "https://drive.google.com/file/d/2xYzAbCdEfGhIjKl/view"
-  }
-]
+{
+  "success": true,
+  "message": "Recibos obtenidos correctamente.",
+  "count": 2,
+  "data": [
+    {
+      "id": "1aBcDeFgHiJkLmNo",
+      "name": "marzo-2026-12345",
+      "createdTime": "2026-03-01T10:01:00.000Z",
+      "webViewLink": "https://drive.google.com/file/d/1aBcDeFgHiJkLmNo/view"
+    },
+    {
+      "id": "2xYzAbCdEfGhIjKl",
+      "name": "marzo-2026-67890",
+      "createdTime": "2026-03-01T10:00:00.000Z",
+      "webViewLink": "https://drive.google.com/file/d/2xYzAbCdEfGhIjKl/view"
+    }
+  ],
+  "timestamp": 1743505260000
+}
 ```
+
+> Devuelve como maximo los **4 ultimos archivos subidos**, ordenados por fecha de creacion descendente.
 
 ### POST /api/recibos/{fileId}/firmar
 
@@ -386,6 +395,15 @@ Verificar que el archivo existe en `src/main/resources/` y que `application.prop
 ```properties
 spring.config.import=optional:classpath:dev.properties
 ```
+
+### Incompatibilidad Spring Cloud con Spring Boot 4.x
+
+Spring Cloud 2025.0.0 no es compatible con Spring Boot 4.0.x. Referencia clases
+(`WebMvcAutoConfiguration`, `HibernateJpaAutoConfiguration`) que fueron renombradas
+en Spring Boot 4. Por este motivo el proyecto usa Spring Boot **3.4.4** con
+Spring Cloud **2024.0.1**, que son versiones estables y completamente compatibles.
+
+---
 
 ### `403 Forbidden` al llamar a Drive API
 
