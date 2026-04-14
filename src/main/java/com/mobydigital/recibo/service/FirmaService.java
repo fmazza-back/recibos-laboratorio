@@ -30,11 +30,11 @@ public class FirmaService {
     public byte[] firmarDocumento(byte[] pdfBytes, String usuarioId) throws Exception {
 
         // 1. Pedir la info de la firma al endpoint
-        String urlApiCompañero = "https://un-link-de-prueba.com/firma_braian.png" + usuarioId;
+        String urlApi = "https://un-link-de-prueba.com/firma_braian.png" + usuarioId;
         FirebaseFirmaResponse response;
 
         try {
-            response = restTemplate.getForObject(urlApiCompañero, FirebaseFirmaResponse.class);
+            response = restTemplate.getForObject(urlApi, FirebaseFirmaResponse.class);
         } catch (Exception e) {
             throw new FirmaException("No se pudo conectar con el servicio de firmas de Firebase.");
         }
@@ -45,13 +45,13 @@ public class FirmaService {
         }
 
         // 3. Descargar la imagen  desde la URL proporcionada
-        byte[] imagenFirma = descargarImagenDesdeUrl(response.getUrl_firma());
+        byte[] imagenFirma = descargarUrl(response.getUrl_firma());
 
         // 4. Firmar
-        return aplicarEstampado(pdfBytes, imagenFirma, usuarioId);
+        return aplicarFirma(pdfBytes, imagenFirma, usuarioId);
     }
 
-    private byte[] descargarImagenDesdeUrl(String urlImagen) {
+    private byte[] descargarUrl(String urlImagen) {
         try (InputStream in = new URL(urlImagen).openStream()) {
             return in.readAllBytes();
         } catch (IOException e) {
@@ -59,7 +59,7 @@ public class FirmaService {
         }
     }
 
-    private byte[] aplicarEstampado(byte[] pdfBytes, byte[] firmaBytes, String id) throws IOException {
+    private byte[] aplicarFirma(byte[] pdfBytes, byte[] firmaBytes, String id) throws IOException {
         try (PDDocument document = PDDocument.load(pdfBytes)) {
             PDPage page = document.getPage(document.getNumberOfPages() - 1);
 
