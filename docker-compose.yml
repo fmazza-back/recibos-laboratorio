@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  firebase-emulators:
+    build: .
+    container_name: firmas-firebase-local
+    ports:
+      - "4000:4000" # Consola UI
+      - "8080:8080" # Firestore
+      - "9199:9199" # Storage
+    volumes:
+      # Mapea tus archivos de configuración al contenedor
+      - ./firebase.json:/app/firebase.json
+      - ./.firebaserc:/app/.firebaserc
