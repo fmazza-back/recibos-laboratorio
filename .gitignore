@@ -34,3 +34,11 @@ build/
 
 ### Secrets ###
 src/main/resources/dev.properties
+
+# --- FIREBASE EMULADORES ---
+# Carpeta donde el emulador guarda datos locales
+.firebase/
+
+# Archivos de registro (logs) de errores
+firebase-debug.log
+ui-debug.log
