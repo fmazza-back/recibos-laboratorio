@@ -45,7 +45,7 @@ public class FirmaService {
         }
 
         // 3. Descargar la imagen  desde la URL proporcionada
-        byte[] imagenFirma = descargarUrl(response.getUrlFirma());
+        byte[] imagenFirma = descargarImagenDesdeUrl(response.getUrlfirma());
 
         // 4. Firmar
         return aplicarFirma(pdfBytes, imagenFirma, usuarioId);

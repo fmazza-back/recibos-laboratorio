@@ -27,14 +27,40 @@ public class GoogleDriveService {
     private String folderId;
 
     /**
-     * Lista los ultimos 4 PDFs subidos a la carpeta de recibos.
+     * Busca la subcarpeta del usuario dentro de la carpeta raiz.
+     * Drive solo devuelve la subcarpeta a la que el usuario tiene acceso.
+     */
+    private String resolverSubcarpetaUsuario(Drive drive) throws IOException {
+        String query = String.format(
+                "'%s' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false",
+                folderId
+        );
+
+        FileList result = drive.files().list()
+                .setQ(query)
+                .setFields("files(id, name)")
+                .setPageSize(1)
+                .execute();
+
+        List<File> carpetas = result.getFiles();
+        if (carpetas == null || carpetas.isEmpty()) {
+            throw new RuntimeException("No se encontro una carpeta de recibos para este usuario.");
+        }
+
+        return carpetas.get(0).getId();
+    }
+
+    /**
+     * Lista los ultimos 4 PDFs de la subcarpeta del usuario.
      */
     public List<ReciboDTO> listarRecibos(String accessToken) throws GeneralSecurityException, IOException {
         Drive drive = driveConfig.buildClient(accessToken);
 
+        // String subcarpetaId = resolverSubcarpetaUsuario(drive);
+
         String query = String.format(
                 "'%s' in parents and mimeType = 'application/pdf' and trashed = false",
-                folderId
+                folderId // subcarpetaId
         );
 
         FileList result = drive.files().list()
