@@ -23,8 +23,8 @@ public class FirmaService {
     private final RestTemplate restTemplate;
 
     // Coords fijas para la firma (ajustar segun necesidad)
-    private static final float X_POSITION = 400;
-    private static final float Y_POSITION = 100;
+    private static final float X_POSITION = 420;
+    private static final float Y_POSITION = 190;
     private static final float ANCHO_DESEADO = 150;
 
     //Obtener la firma de Firebase
@@ -60,7 +60,7 @@ public class FirmaService {
         }
     }
 
-    private byte[] aplicarFirma(byte[] pdfBytes, byte[] firmaBytes, String id) throws IOException {
+    public byte[] aplicarFirma(byte[] pdfBytes, byte[] firmaBytes, String id) throws IOException {
         try (PDDocument document = Loader.loadPDF(pdfBytes)) {
             PDPage page = document.getPage(document.getNumberOfPages() - 1);
 
